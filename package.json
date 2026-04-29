@@ -1,0 +1,19 @@
+{
+  "name": "openmesh-framework",
+  "version": "0.1.0",
+  "private": true,
+  "description": "A Data Mesh Admin & Observability Control Plane with RBAC-governed domain observability",
+  "license": "Apache-2.0",
+  "workspaces": [
+    "packages/sdk/typescript",
+    "packages/admin-shell-ui"
+  ],
+  "scripts": {
+    "build": "npm run build --workspaces",
+    "test": "npm run test --workspaces",
+    "lint": "npm run lint --workspaces"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

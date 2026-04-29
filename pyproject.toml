@@ -1,0 +1,48 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "openmesh-framework"
+version = "0.1.0"
+description = "A Data Mesh Admin & Observability Control Plane with RBAC-governed domain observability"
+readme = "README.md"
+license = {text = "Apache-2.0"}
+requires-python = ">=3.10"
+authors = [
+    {name = "OpenMesh Contributors"}
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+dependencies = [
+    "pyyaml>=6.0",
+    "pyjwt>=2.8.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4",
+    "hypothesis>=6.82",
+    "pytest-cov>=4.1",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = "-v --tb=short"
+
+[tool.hypothesis]
+max_examples = 100
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["packages*"]
