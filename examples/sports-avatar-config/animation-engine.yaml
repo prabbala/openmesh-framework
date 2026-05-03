@@ -1,0 +1,26 @@
+# Sports-Avatar LLC — Animation Engine Domain Registration
+# This domain monitors the GPU-powered animation rendering infrastructure
+# using the GPU adapter for render pipeline observability.
+
+domain_id: "animation-engine"
+runtime_type: "gpu"
+observability_adapter: "packages.observability.adapters.gpu.adapter.GPUAdapter"
+entity_id: "sports-avatar"
+lob_id: "p-lob-animation"
+roles:
+  - superuser
+  - admin
+  - operator
+tabs:
+  - title: "GPU Health"
+    panel_type: "health_grid"
+    data_source: "gpu_health"
+  - title: "Render Metrics"
+    panel_type: "metric_chart"
+    data_source: "gpu_metrics"
+  - title: "Pipeline Status"
+    panel_type: "table"
+    data_source: "render_pipeline"
+metadata:
+  description: "Animation engine GPU rendering and pipeline observability"
+  version: "1.0.0"

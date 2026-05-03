@@ -1,25 +1,51 @@
-# Sports-Avatar Configuration Example
+# Sports-Avatar LLC — Example Configuration
 
-This example demonstrates how Sports-Avatar LLC consumes the OpenMesh Framework.
+This directory demonstrates how **Sports-Avatar LLC** consumes the OpenMesh framework
+as a dependency and registers its business domains for observability.
 
-## Overview
+## Entity Structure (4-Tier Model)
 
-Sports-Avatar operates creative and streaming products that use specialized adapters:
+```
+Entity: Sports-Avatar LLC
+├── Domain: Animation Engine            → runtime_type: gpu
+│   ├── Product_Family: Render Farm
+│   │   └── Resource: GPU render nodes (A100)
+│   └── Product_Family: Asset Pipeline
+│       └── Resource: Blender processing nodes
+└── Domain: Cric-Avatar                 → runtime_type: streaming
+    ├── Product_Family: Live Streaming
+    │   └── Resource: CDN edge nodes
+    └── Product_Family: Avatar Delivery
+        └── Resource: Transcoding pipeline
+```
 
-- **Animation Engine** — Uses the `GPUAdapter` for Blender/Three.js GPU utilization and render pipeline health
-- **Streaming Delivery** — Uses the `StreamingAdapter` for video and media streaming health
+## Domain Registrations
 
-## 4-Tier Mapping
+| File                    | Domain           | Runtime Type | Adapter          |
+| ----------------------- | ---------------- | ------------ | ---------------- |
+| `animation-engine.yaml` | Animation Engine | gpu          | GPUAdapter       |
+| `cric-avatar.yaml`      | Cric-Avatar      | streaming    | StreamingAdapter |
 
-| Layer          | Value                     |
-| -------------- | ------------------------- |
-| Entity         | Sports-Avatar LLC         |
-| Domain (LOB)   | Digital Humans            |
-| Product_Family | Cric-Avatar               |
-| Resource       | Blender Render Node / GPU |
+## LOB Mapping
 
-## Usage
+| LOB ID              | Category | Domains          |
+| ------------------- | -------- | ---------------- |
+| `p-lob-animation`   | P_LOB    | Animation Engine |
+| `p-lob-cric-avatar` | P_LOB    | Cric-Avatar      |
 
-Place DomainRegistration YAML files in your project's `openmesh-config/domains/` directory and reference the appropriate adapter class.
+## How to Use
 
-See the framework documentation for the full adapter development guide.
+1. Install the framework: `pip install openmesh-core`
+2. Place these YAML files in your project's config directory
+3. Load registrations on startup:
+
+```python
+from packages.core.domain_registry.serialization import deserialize_from_yaml
+from packages.core.domain_registry.registry import DomainRegistry
+
+registry = DomainRegistry()
+
+with open("animation-engine.yaml") as f:
+    reg = deserialize_from_yaml(f.read())
+    registry.register(reg)
+```

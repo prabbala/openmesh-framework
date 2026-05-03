@@ -1,0 +1,27 @@
+# Empirical-AiS Inc. — Cybersecurity (DeCMMC) Domain Registration
+# This domain monitors the cybersecurity compliance infrastructure
+# using the server adapter for EC2/Docker/Nginx observability.
+
+domain_id: "cybersecurity-decmmc"
+runtime_type: "server"
+observability_adapter: "packages.observability.adapters.server.adapter.ServerAdapter"
+entity_id: "empirical-ais"
+lob_id: "p-lob-cybersecurity"
+roles:
+  - superuser
+  - admin
+  - operator
+tabs:
+  - title: "Server Health"
+    panel_type: "health_grid"
+    data_source: "health_checks"
+  - title: "EC2 Metrics"
+    panel_type: "metric_chart"
+    data_source: "metrics"
+  - title: "Compliance Status"
+    panel_type: "table"
+    data_source: "compliance_status"
+metadata:
+  description: "Cybersecurity DeCMMC domain observability"
+  version: "1.0.0"
+  compliance_framework: "CMMC Level 2"

@@ -1,44 +1,115 @@
 # Adapter Development Guide
 
-This guide explains how to build custom observability adapters for the OpenMesh Framework.
-
 ## Overview
 
-An adapter implements the `ObservabilityAdapterInterface` to provide health checks, metrics, and dashboard panels for a specific runtime type (server, serverless, kubernetes, gpu, streaming).
+Adapters are the bridge between your infrastructure and the OpenMesh dashboard.
+Each adapter implements the `ObservabilityAdapterInterface` to provide health checks,
+metrics, and dashboard panels for a specific runtime type.
 
-## Quick Start
+## Adapter Interface
 
-Use the SDK scaffold command to generate a starter adapter:
+Every adapter must implement four methods:
 
-```bash
-python -m openmesh_sdk.scaffold --name my-adapter --runtime-type server
+```python
+from packages.observability.interface.adapter import ObservabilityAdapterInterface
+
+class MyAdapter(ObservabilityAdapterInterface):
+    def get_health_checks(self) -> List[HealthCheck]:
+        """Return health probe results."""
+        ...
+
+    def get_metrics(self) -> List[Metric]:
+        """Return current metric data points."""
+        ...
+
+    def get_panel_definitions(self) -> List[PanelDefinition]:
+        """Return dashboard panel specifications."""
+        ...
+
+    def get_adapter_metadata(self) -> AdapterMetadata:
+        """Return adapter name, version, runtime types, description."""
+        ...
 ```
 
-## Interface Methods
+## Using the Scaffold Command
 
-Every adapter must implement:
+The fastest way to create a new adapter:
 
-- `get_health_checks()` — Return health check results
-- `get_metrics()` — Return current metrics
-- `get_panel_definitions()` — Return dashboard panel definitions
-- `get_adapter_metadata()` — Return adapter metadata
+```python
+from openmesh_sdk.scaffold import scaffold_adapter
 
-## MeshHealthEvent
+scaffold_adapter(
+    adapter_name="my-custom-adapter",
+    output_dir="./adapters",
+    runtime_type="server",
+    description="Monitors my custom infrastructure"
+)
+```
 
-All adapters emit `MeshHealthEvent` objects with:
+This generates:
 
-- `entity_id` — Which Entity
-- `domain` — Which Domain
-- `severity` — Critical, Warning, or Info
-- `message` — Human-readable description
-- `timestamp` — When the event occurred
+- `my_custom_adapter/__init__.py` — Package init with exports
+- `my_custom_adapter/adapter.py` — Interface implementation stubs
+- `my_custom_adapter/README.md` — Documentation template
+- `my_custom_adapter/test_adapter.py` — Test harness integration
+
+## Emitting MeshHealthEvents
+
+Adapters emit telemetry using the universal `MeshHealthEvent` schema:
+
+```python
+from packages.observability.interface.adapter import MeshHealthEvent, Severity
+from datetime import datetime, timezone
+
+event = MeshHealthEvent(
+    entity_id="my-entity",
+    domain="my-domain",
+    severity=Severity.WARNING,
+    message="CPU utilization above 80%",
+    timestamp=datetime.now(timezone.utc),
+    metadata={"cpu_percent": 82.5}
+)
+```
+
+Or use the SDK helpers:
+
+```python
+from openmesh_sdk.helpers import warning_event
+
+event = warning_event("my-entity", "my-domain", "CPU utilization above 80%")
+```
 
 ## Validation
 
-Run the SDK validation command to verify your adapter:
+Always validate your adapter before publishing:
 
-```bash
-python -m openmesh_sdk.validator --adapter my_adapter.MyAdapter
+```python
+from openmesh_sdk.validator import AdapterValidator
+
+validator = AdapterValidator()
+report = validator.validate(MyAdapter)
+
+for result in report.results:
+    print(f"{'PASS' if result.passed else 'FAIL'}: {result.method_name}")
 ```
 
-_Full adapter development patterns and examples coming soon._
+## Reference Adapters
+
+Study the reference adapters in `packages/observability/adapters/`:
+
+| Adapter       | Runtime Type | Monitors                         |
+| ------------- | ------------ | -------------------------------- |
+| `server/`     | server       | EC2, Docker, Nginx, Gunicorn     |
+| `serverless/` | serverless   | Lambda, AppSync, DynamoDB, KMS   |
+| `kubernetes/` | kubernetes   | Pod, node, service health        |
+| `gpu/`        | gpu          | GPU utilization, render pipeline |
+| `streaming/`  | streaming    | Video/media streaming            |
+
+## Fault Isolation
+
+If your adapter raises an exception, the framework catches it gracefully:
+
+1. The exception is logged to the Audit Engine
+2. Your adapter's status is set to "degraded"
+3. Other adapters continue operating normally
+4. The dashboard shows a degraded indicator for your panels

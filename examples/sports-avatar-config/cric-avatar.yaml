@@ -1,0 +1,27 @@
+# Sports-Avatar LLC — Cric-Avatar Domain Registration
+# This domain monitors the cricket avatar streaming infrastructure
+# using the streaming adapter for live content delivery observability.
+
+domain_id: "cric-avatar"
+runtime_type: "streaming"
+observability_adapter: "packages.observability.adapters.streaming.adapter.StreamingAdapter"
+entity_id: "sports-avatar"
+lob_id: "p-lob-cric-avatar"
+roles:
+  - superuser
+  - admin
+  - operator
+  - viewer
+tabs:
+  - title: "Stream Health"
+    panel_type: "health_grid"
+    data_source: "stream_health"
+  - title: "Streaming Metrics"
+    panel_type: "metric_chart"
+    data_source: "stream_metrics"
+  - title: "Viewer Analytics"
+    panel_type: "stat_card"
+    data_source: "viewer_analytics"
+metadata:
+  description: "Cric-Avatar live cricket streaming and avatar delivery observability"
+  version: "1.0.0"

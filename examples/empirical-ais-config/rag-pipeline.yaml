@@ -1,0 +1,23 @@
+# Empirical-AiS Inc. — RAG-AI Pipeline Domain Registration
+# This domain monitors the RAG pipeline infrastructure
+# using the server adapter for document processing observability.
+
+domain_id: "rag-pipeline"
+runtime_type: "server"
+observability_adapter: "packages.observability.adapters.server.adapter.ServerAdapter"
+entity_id: "empirical-ais"
+lob_id: "p-lob-rag"
+roles:
+  - superuser
+  - admin
+  - operator
+tabs:
+  - title: "Pipeline Health"
+    panel_type: "health_grid"
+    data_source: "health_checks"
+  - title: "Embedding Metrics"
+    panel_type: "metric_chart"
+    data_source: "metrics"
+metadata:
+  description: "RAG-AI document processing and retrieval pipeline observability"
+  version: "1.0.0"
