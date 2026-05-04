@@ -87,6 +87,12 @@ export interface TabDefinition {
 
 // ── DomainRegistration ──────────────────────────────────────────────
 
+export interface ProductFamilyDefinition {
+  family_id: string;
+  name: string;
+  description?: string;
+}
+
 export interface DomainRegistration {
   domain_id: string;
   runtime_type: RuntimeType;
@@ -96,4 +102,5 @@ export interface DomainRegistration {
   entity_id: string;
   lob_id: string;
   metadata?: Record<string, unknown>;
+  product_families?: ProductFamilyDefinition[];
 }

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "openmesh-framework"
-version = "0.1.0"
+version = "1.0.0"
 description = "A Data Mesh Admin & Observability Control Plane with RBAC-governed domain observability"
 readme = "README.md"
 license = {text = "Apache-2.0"}
@@ -13,7 +13,7 @@ authors = [
     {name = "OpenMesh Contributors"}
 ]
 classifiers = [
-    "Development Status :: 3 - Alpha",
+    "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Developers",
     "License :: OSI Approved :: Apache Software License",
     "Programming Language :: Python :: 3",

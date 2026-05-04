@@ -1,6 +1,4 @@
-# Empirical-AiS Inc. — RAG-AI Pipeline Domain Registration
-# This domain monitors the RAG pipeline infrastructure
-# using the server adapter for document processing observability.
+# Empirical-AiS Inc. — RAG-AI Pipeline
 
 domain_id: "rag-pipeline"
 runtime_type: "server"
@@ -19,5 +17,5 @@ tabs:
     panel_type: "metric_chart"
     data_source: "metrics"
 metadata:
-  description: "RAG-AI document processing and retrieval pipeline observability"
+  product_name: "RAG Pipeline"
   version: "1.0.0"

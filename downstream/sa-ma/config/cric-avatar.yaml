@@ -1,6 +1,4 @@
-# Sports-Avatar LLC — Cric-Avatar Domain Registration
-# This domain monitors the cricket avatar streaming infrastructure
-# using the streaming adapter for live content delivery observability.
+# Sports-Avatar LLC — Cric-Avatar
 
 domain_id: "cric-avatar"
 runtime_type: "streaming"
@@ -19,9 +17,14 @@ tabs:
   - title: "Streaming Metrics"
     panel_type: "metric_chart"
     data_source: "stream_metrics"
-  - title: "Viewer Analytics"
-    panel_type: "stat_card"
-    data_source: "viewer_analytics"
 metadata:
-  description: "Cric-Avatar live cricket streaming and avatar delivery observability"
+  product_name: "Cric-Avatar"
   version: "1.0.0"
+
+product_families:
+  - family_id: "cric-live-stream"
+    name: "Live Stream"
+    description: "Real-time cricket match avatar streaming"
+  - family_id: "cric-replay-engine"
+    name: "Replay Engine"
+    description: "On-demand replay generation with avatar overlay"

@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ea-ma"
+version = "1.0.0"
+description = "EAIS-Mesh-Architecture — Empirical-AiS Inc. on OpenMesh Framework"
+license = {text = "Proprietary"}
+requires-python = ">=3.10"
+dependencies = [
+    "openmesh-framework @ git+https://github.com/prabbala/openmesh-framework.git",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4",
+    "hypothesis>=6.82",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.setuptools.packages.find]
+include = ["ea_ma*"]

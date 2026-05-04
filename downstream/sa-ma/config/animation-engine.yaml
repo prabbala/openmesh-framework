@@ -1,6 +1,4 @@
-# Sports-Avatar LLC — Animation Engine Domain Registration
-# This domain monitors the GPU-powered animation rendering infrastructure
-# using the GPU adapter for render pipeline observability.
+# Sports-Avatar LLC — Animation Engine
 
 domain_id: "animation-engine"
 runtime_type: "gpu"
@@ -18,9 +16,14 @@ tabs:
   - title: "Render Metrics"
     panel_type: "metric_chart"
     data_source: "gpu_metrics"
-  - title: "Pipeline Status"
-    panel_type: "table"
-    data_source: "render_pipeline"
 metadata:
-  description: "Animation engine GPU rendering and pipeline observability"
+  product_name: "Animation Engine"
   version: "1.0.0"
+
+product_families:
+  - family_id: "anim-blender-pipeline"
+    name: "Blender Pipeline"
+    description: "Blender-based 3D rendering pipeline"
+  - family_id: "anim-motion-capture"
+    name: "Motion Capture"
+    description: "Real-time motion capture processing"

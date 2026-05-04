@@ -17,6 +17,7 @@ export {
   AdapterMetadata,
   TabDefinition,
   DomainRegistration,
+  ProductFamilyDefinition,
   VALID_SEVERITIES,
   VALID_HEALTH_STATUSES,
   VALID_RUNTIME_TYPES,

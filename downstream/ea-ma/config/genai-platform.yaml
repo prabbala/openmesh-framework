@@ -1,6 +1,4 @@
-# Empirical-AiS Inc. — GenAI Platform Domain Registration
-# This domain monitors the GenAI inference and training infrastructure
-# using the serverless adapter for Lambda/DynamoDB observability.
+# Empirical-AiS Inc. — GenAI Platform
 
 domain_id: "genai-platform"
 runtime_type: "serverless"
@@ -19,5 +17,5 @@ tabs:
     panel_type: "metric_chart"
     data_source: "metrics"
 metadata:
-  description: "GenAI platform inference and training observability"
+  product_name: "GenAI Platform"
   version: "1.0.0"

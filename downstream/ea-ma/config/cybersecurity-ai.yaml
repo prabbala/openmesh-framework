@@ -1,0 +1,34 @@
+# Empirical-AiS Inc. — Cybersecurity-AI
+
+domain_id: "cybersecurity-ai"
+runtime_type: "server"
+observability_adapter: "packages.observability.adapters.server.adapter.ServerAdapter"
+entity_id: "empirical-ais"
+lob_id: "p-lob-cybersecurity"
+roles:
+  - superuser
+  - admin
+  - operator
+  - auditor
+tabs:
+  - title: "Security Health"
+    panel_type: "health_grid"
+    data_source: "health_checks"
+  - title: "Threat Metrics"
+    panel_type: "metric_chart"
+    data_source: "metrics"
+  - title: "ZKP Verification"
+    panel_type: "metric_chart"
+    data_source: "zkp_metrics"
+metadata:
+  product_name: "Cybersecurity-AI"
+  version: "1.0.0"
+  compliance_framework: "CMMC Level 2"
+
+product_families:
+  - family_id: "cybersec-zkp-zdv"
+    name: "zkp-zdv"
+    description: "Zero-Knowledge Proof Zero-Data Verification"
+  - family_id: "cybersec-decmmc"
+    name: "DeCMMC"
+    description: "Decentralized CMMC compliance monitoring"

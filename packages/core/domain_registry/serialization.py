@@ -46,6 +46,8 @@ def serialize_to_yaml(registration: DomainRegistration) -> str:
         data["lob_id"] = registration.lob_id
     if registration.metadata:
         data["metadata"] = dict(registration.metadata)
+    if registration.product_families:
+        data["product_families"] = list(registration.product_families)
 
     return yaml.dump(data, default_flow_style=False, sort_keys=False)
 
@@ -146,4 +148,5 @@ def deserialize_from_yaml(yaml_str: str) -> DomainRegistration:
         entity_id=data.get("entity_id", ""),
         lob_id=data.get("lob_id", ""),
         metadata=data.get("metadata", {}),
+        product_families=data.get("product_families", []),
     )

@@ -1,0 +1,43 @@
+# Empirical-AiS Inc. — Business Atomic Intelligence (BAI)
+# Product: BAI — the PnP/PnP_main product under EA-MA
+
+domain_id: "bai"
+runtime_type: "server"
+observability_adapter: "packages.observability.adapters.server.adapter.ServerAdapter"
+entity_id: "empirical-ais"
+lob_id: "p-lob-bai"
+roles:
+  - superuser
+  - admin
+  - operator
+  - manager
+  - viewer
+tabs:
+  - title: "BAI Health"
+    panel_type: "health_grid"
+    data_source: "health_checks"
+  - title: "Intelligence Metrics"
+    panel_type: "metric_chart"
+    data_source: "metrics"
+  - title: "Vertical Status"
+    panel_type: "table"
+    data_source: "vertical_status"
+metadata:
+  product_name: "Business Atomic Intelligence"
+  version: "1.0.0"
+  description: "Atomic business intelligence across verticals"
+  pnp_product: true
+
+product_families:
+  - family_id: "bai-restaurant-intelligence"
+    name: "Restaurant Intelligence"
+    description: "AI-driven analytics for restaurant operations"
+  - family_id: "bai-supermarket-intelligence"
+    name: "Supermarket Intelligence"
+    description: "Retail analytics for inventory and demand forecasting"
+  - family_id: "bai-it-consulting-100"
+    name: "IT-Consulting-100"
+    description: "IT consulting intelligence for top-100 engagement patterns"
+  - family_id: "bai-realestate"
+    name: "Realestate"
+    description: "Real estate market intelligence and portfolio optimization"

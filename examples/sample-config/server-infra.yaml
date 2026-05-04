@@ -1,0 +1,31 @@
+# Sample Domain Registration — Server Infrastructure
+# Copy and customize this for your own business domains.
+
+domain_id: "my-server-infra"
+runtime_type: "server"
+observability_adapter: "packages.observability.adapters.server.adapter.ServerAdapter"
+entity_id: "my-company"
+lob_id: "p-lob-infrastructure"
+roles:
+  - superuser
+  - admin
+  - operator
+tabs:
+  - title: "Server Health"
+    panel_type: "health_grid"
+    data_source: "health_checks"
+  - title: "Infrastructure Metrics"
+    panel_type: "metric_chart"
+    data_source: "metrics"
+metadata:
+  product_name: "Server Infrastructure"
+  version: "1.0.0"
+  description: "Server infrastructure observability"
+
+product_families:
+  - family_id: "web-tier"
+    name: "Web Tier"
+    description: "Nginx/Gunicorn web servers"
+  - family_id: "app-tier"
+    name: "Application Tier"
+    description: "Application server instances"
