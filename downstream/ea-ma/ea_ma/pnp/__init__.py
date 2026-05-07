@@ -1,26 +1,47 @@
-"""EA-MA PnP — EAIS-specific Plug-N-Play orchestrator.
+"""EA-MA PnP — pnp-prod/EAISPnPMain entry point.
 
-Extends the framework's PnPMain with Empirical-AiS business logic:
-- Email domain enforcement (@empirical-ais.com)
-- Environment awareness (local/staging/production)
-- BAI vertical management (product_type lifecycle)
-- Cross-product intelligence routing
-- EAIS-specific RBAC roles and compliance policies
-- Product catalog with health aggregation
+Inherits from openmesh-framework (github.com/prabbala/openmesh-framework).
+Canonical implementation: ea_ma.pnp.EAISPnPMain
 """
 
-from .pnp_main import (
+from ea_ma.pnp.EAISPnPMain import (
     EAISPnPMain,
     EAISEnvironment,
     BAIVerticalManager,
+    ClientMaintenanceManager,
+    ClientRecord,
     ProductCatalog,
+    CatalogSnapshot,
+    ProductStatus,
+    VerticalInfo,
     UnauthorizedEmailDomainError,
+    EmailVerificationRequiredError,
+    SignupRequest,
+    SignupResult,
+    SignupDestination,
+    SubscriberPlan,
+    SubscriberProfile,
+    SubscriberPortal,
+    SubscriberDashboard,
 )
 
 __all__ = [
     "EAISPnPMain",
     "EAISEnvironment",
     "BAIVerticalManager",
+    "ClientMaintenanceManager",
+    "ClientRecord",
     "ProductCatalog",
+    "CatalogSnapshot",
+    "ProductStatus",
+    "VerticalInfo",
     "UnauthorizedEmailDomainError",
+    "EmailVerificationRequiredError",
+    "SignupRequest",
+    "SignupResult",
+    "SignupDestination",
+    "SubscriberPlan",
+    "SubscriberProfile",
+    "SubscriberPortal",
+    "SubscriberDashboard",
 ]

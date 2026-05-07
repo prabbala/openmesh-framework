@@ -1,0 +1,72 @@
+# Empirical-AiS Inc. — Product: ZKP-ZDV (Zero-Knowledge Proof / Zero-Data Verification)
+# Each LOB has p-lob (product officials) and i-lob (infrastructure officials)
+
+domain_id: "zkp-zdv"
+runtime_type: "server"
+observability_adapter: "packages.observability.adapters.server.adapter.ServerAdapter"
+entity_id: "empirical-ais"
+lob_id: "p-lob-zkp-zdv"
+roles:
+  - superuser
+  - admin
+  - operator
+  - compliance_officer
+  - platform_operator
+  - client_manager
+  - viewer
+tabs:
+  - title: "ZKP-ZDV Health"
+    panel_type: "health_grid"
+    data_source: "health_checks"
+  - title: "Verification Metrics"
+    panel_type: "metric_chart"
+    data_source: "metrics"
+  - title: "LOB Overview"
+    panel_type: "table"
+    data_source: "lob_status"
+metadata:
+  product_name: "ZKP-ZDV (Zero-Knowledge Proof / Zero-Data Verification)"
+  version: "1.0.0"
+  description: "Cybersecurity product — zero-knowledge proof and zero-data verification"
+  compliance_framework: "CMMC Level 2"
+  pnp_product: true
+
+product_families:
+  # p-lob: product-facing LOB officials
+  - family_id: "zkp-finance-p"
+    name: "Finance (p-LOB)"
+    description: "Finance product officials — revenue, billing, forecasting"
+  - family_id: "zkp-marketing-p"
+    name: "Marketing (p-LOB)"
+    description: "Marketing product officials — campaigns, analytics, growth"
+  - family_id: "zkp-sales-p"
+    name: "Sales (p-LOB)"
+    description: "Sales product officials — pipeline, CRM, deal management"
+  - family_id: "zkp-compliance-p"
+    name: "Compliance (p-LOB)"
+    description: "Compliance product officials — audit, regulatory, policy"
+  - family_id: "zkp-operations-p"
+    name: "Operations (p-LOB)"
+    description: "Operations product officials — delivery, SLA, workflow"
+  - family_id: "zkp-it-p"
+    name: "Information-Technology (p-LOB)"
+    description: "IT product officials — infrastructure, DevOps, security"
+  # i-lob: infrastructure-facing LOB officials
+  - family_id: "zkp-finance-i"
+    name: "Finance (i-LOB)"
+    description: "Finance infrastructure officials — cost management, infra billing"
+  - family_id: "zkp-marketing-i"
+    name: "Marketing (i-LOB)"
+    description: "Marketing infrastructure officials — platform tooling, data pipelines"
+  - family_id: "zkp-sales-i"
+    name: "Sales (i-LOB)"
+    description: "Sales infrastructure officials — CRM infra, integrations"
+  - family_id: "zkp-compliance-i"
+    name: "Compliance (i-LOB)"
+    description: "Compliance infrastructure officials — audit infra, log retention"
+  - family_id: "zkp-operations-i"
+    name: "Operations (i-LOB)"
+    description: "Operations infrastructure officials — platform ops, monitoring"
+  - family_id: "zkp-it-i"
+    name: "Information-Technology (i-LOB)"
+    description: "IT infrastructure officials — cloud infra, networking, IAM"

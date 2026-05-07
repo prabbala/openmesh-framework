@@ -25,8 +25,10 @@ from ea_ma.pnp import (
     EAISPnPMain,
     EAISEnvironment,
     BAIVerticalManager,
+    ClientMaintenanceManager,
     ProductCatalog,
     UnauthorizedEmailDomainError,
+    SignupDestination,
 )
 from packages.core.pnp import PnPConfig
 from packages.core.domain_registry.registration import DomainRegistration
@@ -52,7 +54,10 @@ class TestBootstrap:
 
     def test_loads_all_domains(self):
         ids = {d.domain_id for d in _pnp().loaded_domains}
-        assert ids == {"bai", "cybersecurity-ai", "genai-platform", "rag-pipeline"}
+        assert ids == {"bai", "cybersecurity-ai", "genai-platform", "rag-pipeline", "client-maintenance"}
+
+    def test_client_maintenance_manager_initialized(self):
+        assert isinstance(_pnp().client_maintenance, ClientMaintenanceManager)
 
     def test_bai_manager_initialized(self):
         assert isinstance(_pnp().bai, BAIVerticalManager)
@@ -157,18 +162,21 @@ class TestEmailDomainEnforcement:
 class TestAutoAssignment:
 
     def test_eais_user_gets_default_lobs(self):
-        """@empirical-ais.com user with no explicit LOBs gets all EAIS LOBs."""
+        """@empirical-ais.com user gets all p-lobs + i-lobs."""
         pnp = _pnp()
         token = pnp.register_user(
             email="auto@empirical-ais.com", password="p", user_id="auto1",
         )
-        # Verify they can see all 4 domains (because they got all LOBs)
         claims = pnp.auth.get_user_claims(token)
+        # Should include both p-lob and i-lob assignments
+        assert "p-lob-bai" in claims.lob_assignments
+        assert "i-lob-client-maintenance" in claims.lob_assignments
         result = pnp.evaluate_access(
             user_id="auto1", role=claims.role,
             lob_assignments=claims.lob_assignments,
         )
-        assert len(result.authorized_domains) == 4
+        # 4 p-lob domains + 1 i-lob domain
+        assert len(result.authorized_domains) == 5
 
     def test_eais_user_gets_default_role(self):
         """@empirical-ais.com user with no explicit role gets 'operator'."""
@@ -259,8 +267,20 @@ class TestProductCatalog:
 
     def test_snapshot(self):
         snap = _pnp().catalog.snapshot()
-        assert len(snap.products) == 4
-        assert snap.total_verticals == 6
+        assert len(snap.products) == 5   # 4 p-lob + 1 i-lob
+        assert snap.total_verticals == 9  # 4 BAI + 2 cybersec + 3 client-maintenance
+
+    def test_i_lob_product_has_correct_lob_type(self):
+        pnp = _pnp()
+        cm = pnp.catalog.get_product("client-maintenance")
+        assert cm is not None
+        assert cm.lob_type == "infrastructure"
+
+    def test_p_lob_product_has_correct_lob_type(self):
+        pnp = _pnp()
+        bai = pnp.catalog.get_product("bai")
+        assert bai is not None
+        assert bai.lob_type == "product"
 
     def test_list_products_for_scoped_user(self):
         pnp = _pnp()
@@ -281,10 +301,70 @@ class TestEAISRBAC:
     def test_bai_analyst_exists(self):
         assert _pnp().rbac.get_role("bai_analyst") is not None
 
+    def test_platform_operator_exists(self):
+        assert _pnp().rbac.get_role("platform_operator") is not None
+
+    def test_client_manager_exists(self):
+        assert _pnp().rbac.get_role("client_manager") is not None
+
     def test_compliance_officer_read_only(self):
         pnp = _pnp()
         assert pnp.rbac.has_permission("compliance_officer", "audit", "read")
         assert not pnp.rbac.has_permission("compliance_officer", "audit", "write")
+
+    def test_platform_operator_has_tenant_write(self):
+        pnp = _pnp()
+        assert pnp.rbac.has_permission("platform_operator", "tenants", "write")
+        assert pnp.rbac.has_permission("platform_operator", "audit", "read")
+
+
+# ── Client Maintenance (i-lob) ───────────────────────────────────────
+
+
+class TestClientMaintenance:
+
+    def test_manager_initialized(self):
+        assert isinstance(_pnp().client_maintenance, ClientMaintenanceManager)
+
+    def test_onboard_client(self):
+        pnp = _pnp()
+        record = pnp.client_maintenance.onboard_client(
+            client_id="c1", company_name="Sports Avatar LLC",
+            contact_email="ops@sports-avatar.ai", plan="growth",
+            lob_assignments=["p-lob-bai"],
+        )
+        assert record.client_id == "c1"
+        assert record.status == "active"
+        assert pnp.client_maintenance.client_count == 1
+
+    def test_duplicate_client_raises(self):
+        pnp = _pnp()
+        pnp.client_maintenance.onboard_client("c2", "Acme", "a@acme.com", "growth")
+        with pytest.raises(ValueError, match="already exists"):
+            pnp.client_maintenance.onboard_client("c2", "Acme", "a@acme.com", "growth")
+
+    def test_update_client_status(self):
+        pnp = _pnp()
+        pnp.client_maintenance.onboard_client("c3", "Corp", "x@corp.com", "enterprise")
+        record = pnp.client_maintenance.update_client_status("c3", "suspended")
+        assert record.status == "suspended"
+
+    def test_list_clients_by_status(self):
+        pnp = _pnp()
+        pnp.client_maintenance.onboard_client("c4", "A", "a@a.com", "growth")
+        pnp.client_maintenance.onboard_client("c5", "B", "b@b.com", "growth")
+        pnp.client_maintenance.update_client_status("c5", "offboarded")
+        active = pnp.client_maintenance.list_clients(status="active")
+        assert len(active) == 1 and active[0].client_id == "c4"
+
+    def test_client_maintenance_domain_loaded(self):
+        ids = {d.domain_id for d in _pnp().loaded_domains}
+        assert "client-maintenance" in ids
+
+    def test_client_maintenance_is_i_lob(self):
+        pnp = _pnp()
+        reg = next(d for d in pnp.loaded_domains if d.domain_id == "client-maintenance")
+        assert reg.lob_id == "i-lob-client-maintenance"
 
 
 # ── Cross-Product Queries ────────────────────────────────────────────
@@ -298,6 +378,8 @@ class TestCrossProductQueries:
         assert comp["environment"] == "production"
         assert comp["email_enforcement"] is True
         assert "empirical-ais.com" in comp["allowed_email_domains"]
+        assert "client-maintenance" in comp["i_lob_domains"]
+        assert "bai" in comp["p_lob_domains"]
 
     def test_user_verticals_superuser(self):
         verts = _pnp().get_user_verticals(user_id="u1", role="superuser")
@@ -311,7 +393,7 @@ class TestGovernance:
 
     def test_superuser_unrestricted(self):
         r = _pnp().evaluate_access(user_id="u1", role="superuser")
-        assert r.is_unrestricted and len(r.authorized_domains) == 4
+        assert r.is_unrestricted and len(r.authorized_domains) == 5
 
     def test_auditor_denied_admin(self):
         pnp = _pnp()
@@ -324,28 +406,27 @@ class TestGovernance:
 class TestEndToEnd:
 
     def test_full_eais_flow(self):
-        """Bootstrap → register @empirical-ais.com user → auto LOBs → render → catalog."""
+        """Bootstrap → register @empirical-ais.com → p-lob + i-lob → render → catalog."""
         pnp = _pnp(env=EAISEnvironment.PRODUCTION)
 
-        # Register — no explicit role or LOBs
         token = pnp.register_user(
             email="newuser@empirical-ais.com", password="secure", user_id="new1",
         )
 
-        # Should have operator role and all LOBs
         claims = pnp.auth.get_user_claims(token)
         assert claims.role == "operator"
-        assert set(claims.lob_assignments) == {"p-lob-bai", "p-lob-cybersecurity", "p-lob-genai", "p-lob-rag"}
+        # p-lobs + i-lob
+        assert set(claims.lob_assignments) == {
+            "p-lob-bai", "p-lob-cybersecurity", "p-lob-genai", "p-lob-rag",
+            "i-lob-client-maintenance",
+        }
 
-        # Render dashboard — should see all 4 domains
         panels = pnp.render_dashboard(token=token)
         assert len(panels) > 3
 
-        # Catalog shows all products
         snap = pnp.catalog.snapshot()
-        assert len(snap.products) == 4
+        assert len(snap.products) == 5   # 4 p-lob + 1 i-lob
 
-        # Non-EAIS email rejected
         with pytest.raises(UnauthorizedEmailDomainError):
             pnp.register_user(email="outsider@gmail.com", password="p", user_id="out1")
 
@@ -360,3 +441,115 @@ class TestEndToEnd:
         adapter = [p for p in panels if p.source != "core"]
         for p in adapter:
             assert "cybersecurity" in p.panel_id or p.is_degraded
+
+
+# ── Signup Routing ────────────────────────────────────────────────────
+
+
+class TestSignupRouting:
+    """Tests for plug-n-play-infra.ai/signup routing logic."""
+
+    def test_eais_signup_routes_to_pnp(self):
+        """@empirical-ais.com → destination=EAIS_PNP, token issued."""
+        from ea_ma.pnp import SignupRequest, SignupDestination
+        pnp = _pnp()
+        result = pnp.signup(SignupRequest(
+            email="alice@empirical-ais.com",
+            password="Secure1!",
+            company_name="Empirical-AiS",
+            location="Charlotte, NC",
+            product_type="BAI",
+        ))
+        assert result.destination == SignupDestination.EAIS_PNP
+        assert result.destination.value == "pnp-prod/EAISPnPMain"
+        assert result.token is not None
+        assert result.role == "operator"
+        assert result.subscriber_profile is None
+        assert result.requires_email_verification is False
+
+    def test_outsider_signup_routes_to_subscriber(self):
+        """@sports-avatar.ai → destination=SUBSCRIBER_PORTAL, email verification required."""
+        from ea_ma.pnp import SignupRequest, SignupDestination
+        pnp = _pnp()
+        result = pnp.signup(SignupRequest(
+            email="info@sports-avatar.ai",
+            password="Secure1!",
+            company_name="Sports Avatar LLC",
+            location="New York, NY",
+            product_type="BAI",
+        ))
+        assert result.destination == SignupDestination.SUBSCRIBER_PORTAL
+        assert result.role == "subscriber"
+        assert result.requires_email_verification is True
+        assert result.masked_email == "i****@sports-avatar.ai"
+        assert result.subscriber_profile is not None
+        assert result.subscriber_profile.product_type == "BAI"
+        assert result.subscriber_profile.lob_id == "p-lob-bai"
+
+    def test_outsider_subscriber_profile_stored(self):
+        """Subscriber profile is retrievable after signup."""
+        from ea_ma.pnp import SignupRequest
+        pnp = _pnp()
+        result = pnp.signup(SignupRequest(
+            email="bob@outside-eais.com",
+            password="Secure1!",
+            company_name="Outside Corp",
+            location="Austin, TX",
+            product_type="BAI",
+        ))
+        profile = pnp.get_subscriber_profile(result.user_id)
+        assert profile is not None
+        assert profile.company_name == "Outside Corp"
+        assert profile.product_type == "BAI"
+        assert profile.lob_id == "p-lob-bai"
+        assert profile.role == "subscriber"
+
+    def test_list_subscribers_shows_outsiders_only(self):
+        """list_subscribers() returns only outsider subscriber profiles."""
+        from ea_ma.pnp import SignupRequest
+        pnp = _pnp()
+        pnp.signup(SignupRequest(
+            email="sub1@outside.com", password="P1!", company_name="Co1",
+            location="LA", product_type="BAI",
+        ))
+        pnp.signup(SignupRequest(
+            email="internal@empirical-ais.com", password="P1!", company_name="EAIS",
+            location="Charlotte", product_type="BAI",
+        ))
+        subs = pnp.list_subscribers()
+        emails = {s.email for s in subs}
+        assert "sub1@outside.com" in emails
+        assert "internal@empirical-ais.com" not in emails
+
+    def test_subscriber_role_defined(self):
+        """subscriber RBAC role is defined after bootstrap."""
+        assert _pnp().rbac.get_role("subscriber") is not None
+
+    def test_product_type_bai_resolves_to_p_lob_bai(self):
+        """product_type='BAI' always resolves to p-lob-bai."""
+        pnp = _pnp()
+        assert pnp._resolve_lob_for_product_type("BAI") == "p-lob-bai"
+        assert pnp._resolve_lob_for_product_type("bai") == "p-lob-bai"
+
+    def test_password_mismatch_raises(self):
+        """Mismatched confirm_password raises ValueError."""
+        from ea_ma.pnp import SignupRequest
+        pnp = _pnp()
+        with pytest.raises(ValueError, match="Passwords do not match"):
+            pnp.signup(SignupRequest(
+                email="x@empirical-ais.com", password="abc", confirm_password="xyz",
+                company_name="X", location="X", product_type="BAI",
+            ))
+
+    def test_subscriber_portal_renders_scoped_dashboard(self):
+        """Subscriber portal renders a dashboard scoped to BAI LOB."""
+        from ea_ma.pnp import SignupRequest
+        pnp = _pnp()
+        result = pnp.signup(SignupRequest(
+            email="portal@sports-avatar.ai", password="P1!",
+            company_name="Sports Avatar", location="NYC", product_type="BAI",
+        ))
+        dashboard = pnp.subscriber_portal.render(result.token)
+        assert dashboard.product_type == "BAI"
+        assert dashboard.lob_id == "p-lob-bai"
+        assert dashboard.company_name == "Sports Avatar"

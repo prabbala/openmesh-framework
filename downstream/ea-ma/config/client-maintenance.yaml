@@ -1,0 +1,41 @@
+# Empirical-AiS Inc. — Client Maintenance (Infrastructure LOB)
+# i-lob: internal platform operations, client lifecycle, observability infra
+
+domain_id: "client-maintenance"
+runtime_type: "server"
+observability_adapter: "packages.observability.adapters.server.adapter.ServerAdapter"
+entity_id: "empirical-ais"
+lob_id: "i-lob-client-maintenance"
+roles:
+  - superuser
+  - admin
+  - operator
+  - platform_operator
+  - client_manager
+tabs:
+  - title: "Client Health"
+    panel_type: "health_grid"
+    data_source: "health_checks"
+  - title: "Onboarding Status"
+    panel_type: "table"
+    data_source: "client_onboarding"
+  - title: "Platform Metrics"
+    panel_type: "metric_chart"
+    data_source: "metrics"
+metadata:
+  product_name: "Client Maintenance"
+  version: "1.0.0"
+  description: "Internal platform operations and client lifecycle management"
+  lob_type: "infrastructure"
+  pnp_product: true
+
+product_families:
+  - family_id: "cm-onboarding"
+    name: "Client Onboarding"
+    description: "New client provisioning and setup workflows"
+  - family_id: "cm-observability-infra"
+    name: "Observability Infrastructure"
+    description: "Platform-level observability adapter management"
+  - family_id: "cm-tenant-ops"
+    name: "Tenant Operations"
+    description: "Tenant lifecycle, billing, and configuration"
